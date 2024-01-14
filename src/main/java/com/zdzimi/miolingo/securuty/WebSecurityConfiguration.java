@@ -38,7 +38,7 @@ public class WebSecurityConfiguration {
     http.cors(Customizer.withDefaults());
     http.csrf(AbstractHttpConfigurer::disable).authorizeHttpRequests(
         req -> req
-            .requestMatchers("/miolingo/sign-up").permitAll()
+            .requestMatchers("/miolingo/sign-up", "/miolingo/activation/**").permitAll()
             .anyRequest().authenticated()
     ).httpBasic(Customizer.withDefaults());
     return http.build();

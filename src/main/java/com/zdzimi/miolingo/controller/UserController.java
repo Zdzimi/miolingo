@@ -1,6 +1,7 @@
 package com.zdzimi.miolingo.controller;
 
 import com.zdzimi.miolingo.data.SigningUser;
+import com.zdzimi.miolingo.service.MailService;
 import com.zdzimi.miolingo.service.UsersService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -12,12 +13,18 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
   private final UsersService usersService;
+  private final MailService mailService;
 
   @PostMapping("/sign-up")
   public String signUp(@RequestBody SigningUser signingUser) {
-    usersService.signUp(signingUser);
-    // todo send mail with activation code.
+    mailService.sendActivationCode(usersService.signUp(signingUser));
     return signingUser.getEmail();
+  }
+
+  @GetMapping("/activation/{code}")
+  public String activateAccount(@PathVariable String code) {
+    // todo activate account
+    return code;
   }
 
 }
