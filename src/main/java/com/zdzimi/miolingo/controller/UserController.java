@@ -22,9 +22,8 @@ public class UserController {
   }
 
   @GetMapping("/activation/{code}")
-  public String activateAccount(@PathVariable String code) {
-    // todo activate account
-    return code;
+  public void activateAccount(@PathVariable String code) {
+    usersService.activateAccount(code);
   }
 
 }

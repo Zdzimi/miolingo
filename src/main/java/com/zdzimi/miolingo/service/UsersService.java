@@ -22,6 +22,22 @@ public class UsersService {
     return usersRepository.save(userEntity);
   }
 
+  public void activateAccount(String code) {
+    UserEntity userEntity = usersRepository.findByActivationCode(code)
+        .orElseThrow(() -> new ActivationCodeNotFoundException(code));
+    if (!halfHourHasPassed(code)) {
+      userEntity.setActive(true);
+      userEntity.setActivationCode(null);
+      usersRepository.save(userEntity);
+    } else {
+      throw new ActivationCodeExpiredException(code);
+    }
+  }
+
+  private boolean halfHourHasPassed(String code) {
+    return LocalDateTime.now().isAfter(CodeUtils.getDateTime(code).plusMinutes(30));
+  }
+
   private static class Mapper {
 
     public static UserEntity map(SigningUser signingUser) {
@@ -54,6 +70,18 @@ public class UsersService {
       sb.append("-");
       sb.append(Integer.toHexString(now.getSecond()));
       return sb.toString();
+    }
+
+    public static LocalDateTime getDateTime(String code) {
+      String[] split = code.split("-");
+      return LocalDateTime.of(
+          Integer.parseInt(split[1], 16),
+          Integer.parseInt(split[2], 16),
+          Integer.parseInt(split[3], 16),
+          Integer.parseInt(split[4], 16),
+          Integer.parseInt(split[5], 16),
+          Integer.parseInt(split[6], 16)
+      );
     }
 
   }
