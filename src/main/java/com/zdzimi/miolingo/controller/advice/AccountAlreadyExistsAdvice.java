@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 public class AccountAlreadyExistsAdvice {
 
   @ExceptionHandler(AccountAlreadyExistsException.class)
-  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  @ResponseStatus(HttpStatus.CONFLICT)
   public String accountAlreadyExistsHandler(AccountAlreadyExistsException e) {
     return e.getMessage();
   }

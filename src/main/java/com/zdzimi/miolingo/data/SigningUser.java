@@ -11,6 +11,7 @@ import lombok.Setter;
 public class SigningUser {
 
   @Email(message = "Pass the e-mail address.")
+  @NotEmpty(message = "E-mail is required.")
   private String email;
   @NotEmpty(message = "Name is required.")
   private String name;
