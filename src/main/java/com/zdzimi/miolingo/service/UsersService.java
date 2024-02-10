@@ -1,12 +1,15 @@
 package com.zdzimi.miolingo.service;
 
 import com.zdzimi.miolingo.data.SigningUser;
+import com.zdzimi.miolingo.data.SubmittedUser;
 import com.zdzimi.miolingo.data.model.UserEntity;
 import com.zdzimi.miolingo.data.repository.UsersRepository;
 import java.time.LocalDateTime;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.util.HtmlUtils;
 
 @Service
 @RequiredArgsConstructor
@@ -14,24 +17,38 @@ public class UsersService {
 
   private final UsersRepository usersRepository;
   private final PasswordEncoder passwordEncoder;
+  private final MailService mailService;
 
-  public UserEntity signUp(SigningUser signingUser) {
+  public SubmittedUser signUp(SigningUser signingUser) {
+    if (hasActiveAccount(signingUser)) {
+      throw new AccountAlreadyExistsException(signingUser.getEmail());
+    }
+    UserEntity savedUser = saveUser(signingUser);
+    mailService.sendActivationCode(savedUser);
+    return Mapper.map(savedUser);
+  }
+
+  public SubmittedUser activateAccount(String code) {
+    if (halfHourHasPassed(code)) {
+      throw new ActivationCodeExpiredException(code);
+    }
+    UserEntity userEntity = usersRepository.findByActivationCode(code)
+        .orElseThrow(() -> new ActivationCodeNotFoundException(code));
+    userEntity.setActive(true);
+    userEntity.setActivationCode(null);
+    return Mapper.map(usersRepository.save(userEntity));
+  }
+
+  private boolean hasActiveAccount(SigningUser signingUser) {
+    Optional<UserEntity> entityOptional = usersRepository.findById(signingUser.getEmail());
+    return entityOptional.isPresent() && entityOptional.get().isActive();
+  }
+
+  private UserEntity saveUser(SigningUser signingUser) {
     signingUser.setPassword(passwordEncoder.encode(signingUser.getPassword()));
     UserEntity userEntity = Mapper.map(signingUser);
     userEntity.setActivationCode(CodeUtils.getCode());
     return usersRepository.save(userEntity);
-  }
-
-  public void activateAccount(String code) {
-    UserEntity userEntity = usersRepository.findByActivationCode(code)
-        .orElseThrow(() -> new ActivationCodeNotFoundException(code));
-    if (!halfHourHasPassed(code)) {
-      userEntity.setActive(true);
-      userEntity.setActivationCode(null);
-      usersRepository.save(userEntity);
-    } else {
-      throw new ActivationCodeExpiredException(code);
-    }
   }
 
   private boolean halfHourHasPassed(String code) {
@@ -47,6 +64,13 @@ public class UsersService {
       uE.setPassword(signingUser.getPassword());
       uE.setRole("ROLE_USER");
       return uE;
+    }
+
+    public static SubmittedUser map(UserEntity userEntity) {
+      SubmittedUser submittedUser = new SubmittedUser();
+      submittedUser.setEmail(HtmlUtils.htmlEscape(userEntity.getEmail()));
+      submittedUser.setName(HtmlUtils.htmlEscape(userEntity.getName()));
+      return submittedUser;
     }
 
   }

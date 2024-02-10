@@ -1,6 +1,5 @@
-package com.zdzimi.miolingo.securuty;
+package com.zdzimi.miolingo.security;
 
-import com.zdzimi.miolingo.data.model.UserEntity;
 import com.zdzimi.miolingo.data.repository.UsersRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;

@@ -1,4 +1,4 @@
-package com.zdzimi.miolingo.securuty;
+package com.zdzimi.miolingo.security;
 
 import java.util.Arrays;
 import java.util.Collections;

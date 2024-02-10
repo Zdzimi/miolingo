@@ -1,4 +1,4 @@
-package com.zdzimi.miolingo.securuty;
+package com.zdzimi.miolingo.security;
 
 import com.zdzimi.miolingo.data.model.UserEntity;
 import java.util.Collection;

@@ -1,5 +1,8 @@
 package com.zdzimi.miolingo.data;
 
+import com.zdzimi.miolingo.data.validation.Password;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -7,8 +10,11 @@ import lombok.Setter;
 @Setter
 public class SigningUser {
 
+  @Email(message = "Pass the e-mail address.")
   private String email;
+  @NotEmpty(message = "Name is required.")
   private String name;
+  @Password
   private String password;
 
 }

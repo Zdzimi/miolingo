@@ -1,4 +1,4 @@
-package com.zdzimi.miolingo.securuty;
+package com.zdzimi.miolingo.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
