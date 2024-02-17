@@ -2,8 +2,10 @@ package com.zdzimi.miolingo.service;
 
 import com.zdzimi.miolingo.data.SigningUser;
 import com.zdzimi.miolingo.data.SubmittedUser;
+import com.zdzimi.miolingo.data.User;
 import com.zdzimi.miolingo.data.model.UserEntity;
 import com.zdzimi.miolingo.data.repository.UsersRepository;
+import com.zdzimi.miolingo.security.PrincipalUser;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +39,10 @@ public class UsersService {
     userEntity.setActive(true);
     userEntity.setActivationCode(null);
     return Mapper.map(usersRepository.save(userEntity));
+  }
+
+  public User getUser(PrincipalUser principalUser) {
+    return Mapper.map(principalUser);
   }
 
   private boolean hasActiveAccount(SigningUser signingUser) {
@@ -73,6 +79,12 @@ public class UsersService {
       return submittedUser;
     }
 
+    public static User map(PrincipalUser principalUser) {
+      User user = new User();
+      user.setEmail(principalUser.getUsername());
+      user.setName(principalUser.getUserEntity().getName());
+      return user;
+    }
   }
 
   private static class CodeUtils {

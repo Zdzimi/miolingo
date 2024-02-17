@@ -2,9 +2,12 @@ package com.zdzimi.miolingo.controller;
 
 import com.zdzimi.miolingo.data.SigningUser;
 import com.zdzimi.miolingo.data.SubmittedUser;
+import com.zdzimi.miolingo.data.User;
+import com.zdzimi.miolingo.security.PrincipalUser;
 import com.zdzimi.miolingo.service.UsersService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -31,6 +34,11 @@ public class UserController {
     modelAndView.addObject("email", submittedUser.getEmail());
     modelAndView.addObject("name", submittedUser.getName());
     return modelAndView;
+  }
+
+  @GetMapping("/sign-in")
+  public User getUser(@AuthenticationPrincipal PrincipalUser principalUser) {
+    return usersService.getUser(principalUser);
   }
 
 }
